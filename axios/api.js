@@ -3,17 +3,26 @@ import axios from 'axios';
 const url = 'https://api.jikan.moe/v4';
 
 export const fetchRandomAnime = async () => {
-  const { data } = await axios.get(`${url}/random/anime`);
-
-  if (data.data.rating.includes('RX')) {
-    return this.fetchRandomAnime();
-  }
+  const { data } = await axios.get(`${url}/random/anime`, {
+    params: { sfw: true }
+  });
 
   return data;
 }
 
 export const fetchAnimeById = async (id) => {
   const { data } = await axios.get(`${url}/anime/${id}`)
+
+  return data;
+}
+
+export const fetchAnimeByWord = async (anime) => {
+  const { data } = await axios.get(`${url}/anime`, {
+    params: {
+      q: anime,
+      order_by: 'score',
+    }
+  });
 
   return data;
 }

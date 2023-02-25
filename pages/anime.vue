@@ -1,9 +1,11 @@
 <template>
-  <div class="anime-container">
-    <AniLoading v-if="request_pending" />
+  <div class="background">
+    <div class="anime-container">
+        <AniLoading v-if="request_pending" />
 
-    <div v-else>
-      outro
+      <div v-else class="anime-content">
+        outro
+      </div>
     </div>
   </div>
 </template>
@@ -32,7 +34,18 @@
 </script>
 
 <style scoped>
+  .background {
+    background-image: linear-gradient(to right bottom, #f092e8, #ff91bc, #ffa888, #ffcf60, #ebf864);
+    width: 100vw;
+    height: 100vh
+  }
+
   .anime-container {
-    height: 100vh;
+    max-width: 2400px;
+    padding: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    position: relative;
+    padding-top: 60px;
   }
 </style>
