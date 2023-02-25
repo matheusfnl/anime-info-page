@@ -14,7 +14,7 @@
   .header {
     width: 100%;
     padding: 10px;
-    background: rgba(1,1,1, .2);
+    background: rgba(1,1,1, .2)
   }
 
   .max-width {
