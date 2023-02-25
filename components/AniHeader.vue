@@ -9,7 +9,32 @@
         </div>
 
         <div class="col-6 justify-content-center">
-          <input class="input-text" type="text" placeholder="Digite o nome" @input="searchAnime" />
+          <input v-model="search_string" class="input-text" type="text" placeholder="Digite o nome" @focus="searchFocus" @blur="searchNotFocus" />
+          <div v-if="shouldShowResults" class="result-container" @click="searchFocus">
+            <template v-if="! request_pending">
+              <div v-for="(anime, index) in getSearchResults" :key="index" class="w-100">
+                <AniSearchResult :resource="anime" />
+              </div>
+            </template>
+
+            <div v-if="request_pending" class="loader empty">
+              <SyncLoader color="#ff91bc" size="4px" />
+            </div>
+
+            <div v-else-if="! request_pending && ! getSearchResults.length" class="empty">
+              No results.
+            </div>
+
+            <hr>
+
+            <div class="result-here">
+              View all results
+
+              <a href="#" style="margin-left: 4px;">
+                here.
+              </a>
+            </div>
+          </div>
         </div>
 
         <div class="col-3 justify-content-end">
@@ -21,22 +46,66 @@
 </template>
 
 <script>
+  import { debounce } from 'lodash';
+
+  import SyncLoader from 'vue-spinner/src/SyncLoader.vue';
+
   import { fetchAnimeByWord } from '../axios/api'
 
   export default {
+
+    components: { SyncLoader },
     data() {
       return {
+        search_string: '',
         search_results: [],
+        input_focus: false,
+        request_pending: false,
       };
+    },
+    computed: {
+      getSearchResults() {
+        const { data = [] } = this.search_results;
+
+        return data.slice(0, 8);
+      },
+
+      shouldShowResults() {
+        return this.input_focus && this.search_string;
+      },
+
+      getSearchString() {
+        return this.search_string;
+      },
+    },
+
+    watch: {
+      getSearchString(state) {
+        if(state) {
+          this.request_pending = true;
+
+          return this.searchAnime()
+        }
+
+        this.search_results = []
+        this.request_pending = false;
+      }
     },
 
     methods: {
-      async searchAnime() {
-        const { data } = await fetchAnimeByWord();
+      searchAnime: debounce(async function () {
+        this.search_results = await fetchAnimeByWord(this.search_string);
+        this.request_pending = false;
+      }, 800),
 
-        this.search_results = data;
+      searchFocus() {
+        this.input_focus = true;
+      },
+
+      searchNotFocus() {
+        this.input_focus = false;
       }
-    }
+    },
   }
 </script>
 
@@ -86,21 +155,64 @@
       border-radius: 20px;
       width: 400px;
       height:36px;
-      color: rgba(0, 0, 0, .4)
+      color: rgba(0, 0, 0, .4);
+      position: relative;
+
+      &::placeholder {
+        color: rgb(0, 0, 0);
+        opacity: .3;
+      }
+
+      &:focus-visible {
+        color: rgba(0, 0, 0, .8);
+        background-color: #fff;
+        box-shadow: 0 0 0 .1rem rgba(#575757, .2);
+        outline: 0;
+        outline: none;
+      }
     }
 
-    .input-text::placeholder {
-      color: rgb(0, 0, 0);
-      opacity: .3;
-    }
+    .result-container {
+      top: 38px;
+      position: absolute;
+      flex-direction: column;
+      justify-content: start;
+      align-items: flex-start;
+      min-width: 340px;
+      max-width: 340px;
+      padding: 2px 10px;
+      background-color: white;
+      border-radius: 0px 0px 10px 10px;
 
-    .input-text:focus-visible {
-      color: rgba(0, 0, 0, .8);
-      background-color: #fff;
-      box-shadow: 0 0 0 .1rem rgba(#575757, .2);
-      outline: 0;
-      outline: none;
+      .empty { min-height: 26px; }
+      .loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+      }
+
+      hr {
+        border: 0;
+        clear:both;
+        display:block;
+        width: 100%;
+        background-color:#dadada;
+        height: 1px;
+        margin: 4px 0px;
+        font-size: 0.8vw;
+      }
+
+      .result-here {
+        color: rgba(0, 0, 0, .6);
+        font-size: 0.8vw;
+        margin-bottom: 4px;
+
+        a {
+          color: rgba(0, 0, 0, .8);
+          font-style: italic;
+        }
+      }
     }
   }
-
 </style>

@@ -19,8 +19,10 @@ export const fetchAnimeById = async (id) => {
 export const fetchAnimeByWord = async (anime) => {
   const { data } = await axios.get(`${url}/anime`, {
     params: {
-      q: anime,
-      order_by: 'score',
+      letter: anime,
+      order_by: 'popularity',
+      sfw: true,
+      min_score: 5,
     }
   });
 
