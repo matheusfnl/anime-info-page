@@ -8,12 +8,22 @@
           </span>
         </div>
 
-        <div class="col-6 justify-content-center">
-          <input v-model="search_string" class="input-text" type="text" placeholder="Digite o nome" @focus="searchFocus" @blur="searchNotFocus" />
+        <div class="col-6 justify-content-center" @mouseleave="searchNotFocus">
+          <input v-model="search_string" class="input-text" type="text" placeholder="Digite o nome" @mouseover="searchFocus" />
           <div v-if="shouldShowResults" class="result-container" @click="searchFocus">
+            <div class="result-here">
+              View all results
+
+              <a href="#" style="margin-left: 4px;">
+                here.
+              </a>
+            </div>
+
+            <hr>
+
             <template v-if="! request_pending">
               <div v-for="(anime, index) in getSearchResults" :key="index" class="w-100">
-                <AniSearchResult :resource="anime" />
+                <AniSearchResult :resource="anime" @click="closeResults" />
               </div>
             </template>
 
@@ -23,16 +33,6 @@
 
             <div v-else-if="! request_pending && ! getSearchResults.length" class="empty">
               No results.
-            </div>
-
-            <hr>
-
-            <div class="result-here">
-              View all results
-
-              <a href="#" style="margin-left: 4px;">
-                here.
-              </a>
             </div>
           </div>
         </div>
@@ -63,6 +63,7 @@
         request_pending: false,
       };
     },
+
     computed: {
       getSearchResults() {
         const { data = [] } = this.search_results;
@@ -104,6 +105,10 @@
 
       searchNotFocus() {
         this.input_focus = false;
+      },
+
+      closeResults() {
+        this.searchNotFocus();
       }
     },
   }
@@ -119,10 +124,11 @@
     background: rgba(255,255,255,0.3);
     z-index: 1000;
     height: 60px;
+    position: fixed;
   }
 
   .max-width {
-    max-width: 2400px;
+    max-width: 1770px;
     padding: 0;
     left: 50%;
     transform: translateX(-50%);
@@ -206,7 +212,7 @@
       .result-here {
         color: rgba(0, 0, 0, .6);
         font-size: 0.8vw;
-        margin-bottom: 4px;
+        margin: 4px 0;
 
         a {
           color: rgba(0, 0, 0, .8);

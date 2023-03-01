@@ -1,5 +1,5 @@
 <template>
-  <div class="anime-container">
+  <div class="anime-container" @click="openAnimePage">
     <div ref="background" class="image-container mr-1" />
 
     <div class="text-truncate anime-title">
@@ -17,11 +17,7 @@
         </div>
 
         <div>
-          {{ resource.duration }}
-
-          <span v-if="resource.type === 'TV'">
-            per EP
-          </span>
+          {{ resource.duration }} 
         </div>
         
         <div>
@@ -66,7 +62,13 @@
         ]
 
         return `${months[month - 1]} ${day}, ${year}`
-      }
+      },
+
+      openAnimePage() {
+        this.$router.push({ path: `/anime?id=${this.resource.mal_id}` })
+
+        this.$emit('click');
+      },
     },
   }
 </script>
@@ -77,6 +79,7 @@
     display: flex;
     max-width: 320px;
     min-width: 100%;
+    transition: all .2s;
 
     .image-container {
       min-width: 4.4vw;

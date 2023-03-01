@@ -7,6 +7,12 @@ export const fetchRandomAnime = async () => {
     params: { sfw: true }
   });
 
+  const rating = data.data.rating.toLowerCase();
+
+  if(rating.includes('hentai')) {
+    return fetchRandomAnime();
+  }
+
   return data;
 }
 

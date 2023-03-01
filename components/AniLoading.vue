@@ -1,6 +1,6 @@
 <template>
   <div class="centralize">
-    <SyncLoader color="#a56ee0" />
+    <SyncLoader :color="color" />
   </div>
 </template>
 
@@ -11,6 +11,13 @@
 
   export default {
     components: { SyncLoader },
+    props: {
+      color: {
+        type: String,
+        default: '#ffffff',
+      }
+    },
+
     data() {
       return {
         anime: {},
