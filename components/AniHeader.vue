@@ -37,8 +37,9 @@
           </div>
         </div>
 
-        <div class="col-3 justify-content-end">
-          
+        <div class="col-3 justify-content-end gap">
+          <input v-model="color1" type="color" class="mr-2" @input="changeColor" />
+          <input v-model="color2" type="color" @input="changeColor" />
         </div>
       </div>
     </div>
@@ -47,6 +48,7 @@
 
 <script>
   import { debounce } from 'lodash';
+  import { mapActions } from 'vuex';
 
   import SyncLoader from 'vue-spinner/src/SyncLoader.vue';
 
@@ -61,6 +63,8 @@
         search_results: [],
         input_focus: false,
         request_pending: false,
+        color1: '',
+        color2: '',
       };
     },
 
@@ -93,7 +97,18 @@
       }
     },
 
+    mounted() {
+      this.color1 = `#${Math.floor(Math.random()*16777215).toString(16)}`;
+      this.color2 = `#${Math.floor(Math.random()*16777215).toString(16)}`;
+
+      this.setBackgroundColor({
+        color1: this.color1,
+        color2: this.color2,
+      });
+    },
+
     methods: {
+      ...mapActions(['setBackgroundColor']),
       searchAnime: debounce(async function () {
         this.search_results = await fetchAnimeByWord(this.search_string);
         this.request_pending = false;
@@ -109,7 +124,14 @@
 
       closeResults() {
         this.searchNotFocus();
-      }
+      },
+
+      changeColor() {
+        this.setBackgroundColor({
+        color1: this.color1,
+        color2: this.color2,
+      });
+      },
     },
   }
 </script>
@@ -220,5 +242,24 @@
         }
       }
     }
+  }
+
+  input[type="color"] {
+  -webkit-appearance: none;
+    border: none;
+    border-radius: 3px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+
+  input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 1px;
+    border-radius: 10px;
+  }
+
+  input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
   }
 </style>

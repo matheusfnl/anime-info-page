@@ -7,9 +7,9 @@ export const fetchRandomAnime = async () => {
     params: { sfw: true }
   });
 
-  const rating = data.data.rating.toLowerCase();
+  const rating = data?.data?.rating?.toLowerCase() || '';
 
-  if(rating.includes('hentai')) {
+  if(rating.includes('hentai') || !rating) {
     return fetchRandomAnime();
   }
 
@@ -28,7 +28,7 @@ export const fetchAnimeByWord = async (anime) => {
       letter: anime,
       order_by: 'popularity',
       sfw: true,
-      min_score: 5,
+      min_score: 6,
     }
   });
 

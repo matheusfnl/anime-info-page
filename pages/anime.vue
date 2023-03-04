@@ -1,12 +1,12 @@
 <template>
-  <div class="background">
+  <div ref="backgroundColor" class="background">
     <AniLoading v-if="request_pending" />
     
     <div v-show="!request_pending" class="anime-container">
       <div class="row mx-3">
         <div class="back-margin col-2 pr-4">
           <div class="back-container-categories">
-            aa
+            Categorias
           </div>
         </div>
 
@@ -22,11 +22,11 @@
 
                 <div class="anime-stats">
                   <span>
-                    {{ anime.score }} -
+                    Score: {{ anime.score }} •
                   </span>
 
                   <span>
-                    {{ anime.duration }} -
+                    {{ anime.duration }} •
                   </span>
 
                   <span>
@@ -49,7 +49,8 @@
 </template>
 
 <script>
-  import { fetchAnimeById } from '../axios/api';
+  import { mapGetters } from 'vuex';
+import { fetchAnimeById } from '../axios/api';
 
   export default {
     name: 'Anime',
@@ -61,6 +62,7 @@
     },
 
     computed: {
+      ...mapGetters(['getBackgroundColor']),
       getImageSrc() {
         return this.anime?.images?.webp?.large_image_url || {};
       }
@@ -71,10 +73,16 @@
         if(state) {
           this.$refs.animebackground.style.backgroundImage = `url(${state})`;
         }
+      },
+
+      getBackgroundColor() {
+        this.$refs.backgroundColor.style.backgroundImage = `linear-gradient(to right top, ${this.getBackgroundColor[0]}, ${this.getBackgroundColor[1]})`
       }
     },
 
     mounted() {
+      this.$refs.backgroundColor.style.backgroundImage = `linear-gradient(to right top, ${this.getBackgroundColor[0]}, ${this.getBackgroundColor[1]})`
+
       this.$watch(
         () => this.$route.params,
         async () => {
@@ -119,7 +127,7 @@
 
 <style lang="scss" scoped>
   .background {
-    background-image: linear-gradient(to right bottom, #f092e8, #ff91bc, #ffa888, #ffcf60, #ebf864);
+    // background-image: linear-gradient(to right top, #2e4e30, #403866);
     width: 100vw;
     height: 100vh;
     position: fixed;
