@@ -4,12 +4,16 @@ const url = 'https://api.jikan.moe/v4';
 
 export const fetchRandomAnime = async () => {
   const { data } = await axios.get(`${url}/random/anime`, {
-    params: { sfw: true }
+    params: {
+      sfw: true,
+      min_score: 7,
+    }
   });
 
   const rating = data?.data?.rating?.toLowerCase() || '';
+  const score = data?.data?.score
 
-  if(rating.includes('hentai') || !rating) {
+  if(rating.includes('hentai') || !rating || !score || score < 6) {
     return fetchRandomAnime();
   }
 

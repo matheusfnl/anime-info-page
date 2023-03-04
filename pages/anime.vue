@@ -1,43 +1,47 @@
 <template>
-  <div ref="backgroundColor" class="background">
-    <AniLoading v-if="request_pending" />
-    
-    <div v-show="!request_pending" class="anime-container">
-      <div class="row mx-3">
-        <div class="back-margin col-2 pr-4">
-          <div class="back-container-categories">
-            Categorias
+  <div>
+    <div ref="backgroundColor" class="background">
+      <div class="overlay"></div>
+
+      <AniLoading v-if="request_pending" />
+      
+      <div v-show="!request_pending" class="anime-container">
+        <div class="row mx-3">
+          <div class="back-margin col-2 pr-4">
+            <div class="back-container-categories">
+              Categorias
+            </div>
           </div>
-        </div>
-
-        <div class="back-margin col-10">
-          <div ref="animebackground" class="back-container-anime">
-            <div class="d-flex">
-              <img :src="getImageSrc" class="anime-image">
-
-              <div class="anime-details">
-                <div class="anime-title">
-                  {{  anime.title  }}
-                </div>
-
-                <div class="anime-stats">
-                  <span>
-                    Score: {{ anime.score }} •
-                  </span>
-
-                  <span>
-                    {{ anime.duration }} •
-                  </span>
-
-                  <span>
-                    {{ getFormattedDate(anime.aired) }}
-                  </span>
-                </div>
-
-                <hr>
-
-                <div class="anime-synopsis">
-                  {{ anime.synopsis }}
+  
+          <div class="back-margin col-10">
+            <div ref="animebackground" class="back-container-anime">
+              <div class="d-flex">
+                <img :src="getImageSrc" class="anime-image">
+  
+                <div class="anime-details">
+                  <div class="anime-title">
+                    {{  anime.title  }}
+                  </div>
+  
+                  <div class="anime-stats">
+                    <span>
+                      Score: {{ anime.score }} •
+                    </span>
+  
+                    <span>
+                      {{ anime.duration }} •
+                    </span>
+  
+                    <span>
+                      {{ getFormattedDate(anime.aired) }}
+                    </span>
+                  </div>
+  
+                  <hr>
+  
+                  <div class="anime-synopsis">
+                    {{ anime.synopsis }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -163,7 +167,20 @@
     position: fixed;
     overflow-x: hidden;
     overflow-y: auto;
-    transition: all 1s;
+  }
+  .overlay {
+    background-image: url(../assets/images/halftone.png);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    // opacity: .5;
   }
 
   .anime-container {
@@ -183,6 +200,8 @@
       background-color: white;
       width: 100%;
       border-radius: 10px;
+      border: 1px solid black;
+      box-shadow: 3px 3px 0px 0px black;
     }
     .back-container-anime {
       padding: 20px;
@@ -204,6 +223,8 @@
         opacity: 1;
         background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0%,rgba(255, 255, 255, 1) 200px,rgba(255, 255, 255, 1) 100%);
         backdrop-filter: blur(5px);
+        border: 1px solid black;
+        box-shadow: 3px 3px 0px 0px black;
       }
     }
   }
@@ -213,6 +234,8 @@
     border-radius: 10px;
     margin-right: 20px;
     z-index: 10;
+    border: 1px solid black;
+    box-shadow: 3px 3px 0px 0px black;
   }
 
   .anime-details {
