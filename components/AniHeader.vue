@@ -48,7 +48,7 @@
 
 <script>
   import { debounce } from 'lodash';
-  import { mapActions } from 'vuex';
+  import { mapActions, mapGetters } from 'vuex';
 
   import SyncLoader from 'vue-spinner/src/SyncLoader.vue';
 
@@ -69,6 +69,7 @@
     },
 
     computed: {
+      ...mapGetters(['getBackgroundColor']),
       getSearchResults() {
         const { data = [] } = this.search_results;
 
@@ -94,6 +95,13 @@
 
         this.search_results = []
         this.request_pending = false;
+      },
+
+      getBackgroundColor(state, prevState) {
+        if(state !== prevState) {
+          this.color1 = state[0];
+          this.color2 = state[1];
+        }
       }
     },
 

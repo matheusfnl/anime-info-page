@@ -49,8 +49,10 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex';
-import { fetchAnimeById } from '../axios/api';
+  import { mapGetters, mapActions } from 'vuex';
+  import ColorThief from 'colorthief/dist/color-thief.umd.js';
+
+  import { fetchAnimeById } from '../axios/api';
 
   export default {
     name: 'Anime',
@@ -72,6 +74,34 @@ import { fetchAnimeById } from '../axios/api';
       getImageSrc(state) {
         if(state) {
           this.$refs.animebackground.style.backgroundImage = `url(${state})`;
+
+          const animeImage = this.$refs.animebackground;
+          const colorThief = new ColorThief();
+          const backgroundImageUrl = getComputedStyle(animeImage).backgroundImage.replace(/url\((['"])?(.*?)\1\)/gi, '$2').split(',')[0];
+          const image = new Image();
+
+          image.crossOrigin = 'Anonymous';
+          image.src = backgroundImageUrl;
+
+          image.addEventListener('load', () => {
+            const palette = colorThief.getPalette(image, 2); // extrai uma paleta de 8 cores
+            const sortedPalette = palette.sort((a, b) => b[0] - a[0]); // ordena a paleta por intensidade de vermelho
+
+            const colors = []
+
+            sortedPalette.forEach((palette, index) => {
+              const r = palette[0].toString(16).padStart(2, '0');
+              const g = palette[1].toString(16).padStart(2, '0');
+              const b = palette[2].toString(16).padStart(2, '0');
+
+              colors.push('#' + r + g + b);
+            });
+
+            this.setBackgroundColor({
+              color1: colors[0],
+              color2: colors[1],
+            })
+          });
         }
       },
 
@@ -98,6 +128,7 @@ import { fetchAnimeById } from '../axios/api';
     },
 
     methods: {
+      ...mapActions(['setBackgroundColor']),
       getFormattedDate(date) {
         if(date) {
           const { prop: { from: { day, month, year } } } = date;
@@ -127,12 +158,12 @@ import { fetchAnimeById } from '../axios/api';
 
 <style lang="scss" scoped>
   .background {
-    // background-image: linear-gradient(to right top, #2e4e30, #403866);
     width: 100vw;
     height: 100vh;
     position: fixed;
     overflow-x: hidden;
     overflow-y: auto;
+    transition: all 1s;
   }
 
   .anime-container {
