@@ -80,7 +80,11 @@
     },
 
     computed: {
-      ...mapGetters(['getBackgroundColor']),
+      ...mapGetters([
+        'getBackgroundColor',
+        'getColorLocked',
+      ]),
+
       getImageSrc() {
         return this.anime?.images?.webp?.large_image_url || {};
       },
@@ -132,38 +136,40 @@
       },
 
       getImageSrc(state) {
-        if(state) {
-          this.$refs.animebackground.style.backgroundImage = `url(${state})`;
-
-          const animeImage = this.$refs.animebackground;
-          const colorThief = new ColorThief();
-          const backgroundImageUrl = getComputedStyle(animeImage).backgroundImage.replace(/url\((['"])?(.*?)\1\)/gi, '$2').split(',')[0];
-          const image = new Image();
-
-          image.crossOrigin = 'Anonymous';
-          image.src = backgroundImageUrl;
-
-          image.addEventListener('load', () => {
-            const palette = colorThief.getPalette(image, 2);
-            const sortedPalette = palette.sort((a, b) => b[0] - a[0]);
-
-            const colors = []
-
-            sortedPalette.forEach((palette) => {
-              const r = palette[0].toString(16).padStart(2, '0');
-              const g = palette[1].toString(16).padStart(2, '0');
-              const b = palette[2].toString(16).padStart(2, '0');
-
-              colors.push('#' + r + g + b);
+        if(!this.getColorLocked) {
+          if(state) {
+            this.$refs.animebackground.style.backgroundImage = `url(${state})`;
+  
+            const animeImage = this.$refs.animebackground;
+            const colorThief = new ColorThief();
+            const backgroundImageUrl = getComputedStyle(animeImage).backgroundImage.replace(/url\((['"])?(.*?)\1\)/gi, '$2').split(',')[0];
+            const image = new Image();
+  
+            image.crossOrigin = 'Anonymous';
+            image.src = backgroundImageUrl;
+  
+            image.addEventListener('load', () => {
+              const palette = colorThief.getPalette(image, 2);
+              const sortedPalette = palette.sort((a, b) => b[0] - a[0]);
+  
+              const colors = []
+  
+              sortedPalette.forEach((palette) => {
+                const r = palette[0].toString(16).padStart(2, '0');
+                const g = palette[1].toString(16).padStart(2, '0');
+                const b = palette[2].toString(16).padStart(2, '0');
+  
+                colors.push('#' + r + g + b);
+              });
+  
+              this.key = this.key === 0 ? this.key = 1 : this.key = 0;
+  
+              this.setBackgroundColor({
+                color1: colors[0],
+                color2: colors[1],
+              })
             });
-
-            this.key = this.key === 0 ? this.key = 1 : this.key = 0;
-
-            this.setBackgroundColor({
-              color1: colors[0],
-              color2: colors[1],
-            })
-          });
+          }
         }
       },
     },

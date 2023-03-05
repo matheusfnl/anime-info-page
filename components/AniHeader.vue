@@ -37,9 +37,14 @@
           </div>
         </div>
 
-        <div class="col-3 justify-content-end gap">
-          <input v-model="color1" type="color" class="mr-2" @input="changeColor" />
-          <input v-model="color2" type="color" @input="changeColor" />
+        <div class="col-3 justify-content-end">
+          <div class="custom-control custom-switch toggle-switch">
+            <input id="customSwitch1" v-model="lock_colors" type="checkbox" class="custom-control-input">
+            <label class="custom-control-label" for="customSwitch1" />
+          </div>
+
+          <input v-model="color1" type="color" class="mr-2" :disabled="! lock_colors" :class="{'locked' : ! lock_colors}" @input="changeColor" />
+          <input v-model="color2" type="color" :disabled="! lock_colors" :class="{'locked' : ! lock_colors}" @input="changeColor" />
         </div>
       </div>
     </div>
@@ -66,6 +71,7 @@
         color1: '',
         color2: '',
         colors: [],
+        lock_colors: false,
       };
     },
 
@@ -103,7 +109,11 @@
           this.color1 = state[0];
           this.color2 = state[1];
         }
-      }
+      },
+
+      lock_colors(state) {
+        this.setColorLocked(state);
+      },
     },
 
     mounted() {
@@ -114,7 +124,11 @@
     },
 
     methods: {
-      ...mapActions(['setBackgroundColor']),
+      ...mapActions([
+        'setBackgroundColor',
+        'setColorLocked',
+      ]),
+
       searchAnime: debounce(async function () {
         this.search_results = await fetchAnimeByWord(this.search_string);
         this.request_pending = false;
@@ -285,4 +299,13 @@
     border: none;
     border-radius: 3px;
   }
+
+  .toggle-switch {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translate(-200%, -100%);
+  }
+
+  .locked { opacity: .5; }
 </style>
