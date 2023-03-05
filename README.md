@@ -1,4 +1,4 @@
-# nintendo-games
+# Nuxt Project Using Jikan Api
 
 ## Build Setup
 
