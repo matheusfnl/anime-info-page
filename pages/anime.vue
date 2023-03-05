@@ -19,7 +19,7 @@
             <div class="d-flex">
               <img :src="getImageSrc" class="anime-image">
 
-              <div class="anime-details">
+              <div class="anime-details w-100">
                 <div class="anime-title">
                   {{  anime.title  }}
                 </div>
@@ -363,6 +363,7 @@
     .anime-title { font-size: 32px; }
     .anime-stats { color: rgb(82, 82, 82); }
     .anime-synopsis {
+      width: 100%;
       font-size: 13px;
       white-space: pre-line;
     }
