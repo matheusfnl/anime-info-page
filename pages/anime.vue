@@ -40,13 +40,30 @@
 
                 <hr>
 
-                <div class="anime-synopsis">
-                  {{ anime.synopsis }}
+                <div class="d-flex">
+                  <div class="anime-synopsis">
+                    {{ anime.synopsis }}
+                  </div>
+                  
+                  <div v-if="getAnimeHasTrailer" class="p-2 anime-trailer-container" @click="openTrailerModal">
+                    <div class="anime-play" />
+                    <div class="anime-trailer-hover" />
+                    <div class="anime-trailer d-flex justify-content-center align-items-center" :style="getAnimeTrailerImage">
+                      <img src="https://cdn-icons-png.flaticon.com/512/0/375.png" style="width: 48px; opacity: .6;">
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="trailer-modal" :style="shouldShowModal">
+      <div class="backdrop" @click="closeTrailerModal" />
+      <div class="video-player">
+        <iframe width="1280" height="720" :src="getAnimeHasTrailer" />
       </div>
     </div>
   </div>
@@ -76,6 +93,8 @@
             color2: '#9e9e9e',
           },
         ],
+        
+        show_modal: false,
       }
     },
 
@@ -114,6 +133,36 @@
         return {
           'background-image': `linear-gradient(to right top, ${this.colors[0].color1}, ${this.colors[0].color2})`,
           'opacity': '1',
+        }
+      },
+
+      getAnimeHasTrailer() {
+        if(! this.request_pending) {
+          return this.anime?.trailer?.embed_url;
+        }
+
+        return false;
+      },
+
+      getAnimeTrailerImage() {
+        const { images: { medium_image_url = '' } = {} } = this.anime?.trailer || {};
+
+        return {
+          'background-image': `url(${medium_image_url})`,
+        }
+      },
+
+      shouldShowModal() {
+        if(this.show_modal) {
+          return {
+            'visibility': 'visible',
+            'opacity': '1',
+          }
+        }
+
+        return {
+          'visibility': 'hidden',
+          'opacity': '0',
         }
       },
     },
@@ -214,6 +263,14 @@
 
         return '';
       },
+
+      openTrailerModal() {
+        this.show_modal = true;
+      },
+
+      closeTrailerModal() {
+        this.show_modal = false;
+      }
     }
   }
 </script>
@@ -308,6 +365,70 @@
     .anime-synopsis {
       font-size: 13px;
       white-space: pre-line;
+    }
+
+    .anime-trailer {
+      cursor: pointer;
+      width: 200px;
+      height: 133px;
+      background-color: rgb(219, 219, 219);
+      border: 1px solid black;
+      box-shadow: 3px 3px 0px 0px black;
+      background-position: center;
+      background-size: cover;
+      background-image: contain;
+      z-index: 1;
+    }
+
+    .anime-trailer-hover {
+      cursor: pointer;
+      width: 200px;
+      height: 133px;
+      background-color: rgb(255, 255, 255);
+      position: absolute;
+      opacity: 0;
+      transition: all .5s;
+      z-index: 3;
+
+      &:hover {
+        width: 200px;
+        height: 133px;
+        background-color: rgb(255, 255, 255);
+        position: absolute;
+        opacity: .2;
+      }
+    }
+  }
+
+  .trailer-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    width: 100%;
+    height: 100vh;
+    transition: visibility 0.1s linear, opacity 0.1s linear;
+
+    .backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: black;
+      opacity: .3;
+    }
+
+    .video-player {
+      z-index: 1000;
+      background-color: white;
+      min-width: 1280px;
+      min-height: 720px;
+      padding: 10px 10px 2px 10px;
+      border-radius: 10px;
     }
   }
 
