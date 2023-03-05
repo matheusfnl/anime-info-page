@@ -1,5 +1,5 @@
 <template>
-  <AniLoading color="#FF96B0" />
+  <AniLoading color="#000000" />
 </template>
 
 <script>

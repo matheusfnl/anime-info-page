@@ -28,7 +28,7 @@
             </template>
 
             <div v-if="request_pending" class="loader empty">
-              <SyncLoader color="#ff91bc" size="4px" />
+              <SyncLoader color="#000000" size="6px" />
             </div>
 
             <div v-else-if="! request_pending && ! getSearchResults.length" class="empty">
@@ -65,6 +65,7 @@
         request_pending: false,
         color1: '',
         color2: '',
+        colors: [],
       };
     },
 

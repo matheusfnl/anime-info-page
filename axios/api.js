@@ -13,7 +13,7 @@ export const fetchRandomAnime = async () => {
   const rating = data?.data?.rating?.toLowerCase() || '';
   const score = data?.data?.score
 
-  if(rating.includes('hentai') || !rating || !score || score < 6) {
+  if(rating.includes('hentai') || !rating || !score || score < 7) {
     return fetchRandomAnime();
   }
 
