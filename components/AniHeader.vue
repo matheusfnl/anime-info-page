@@ -3,7 +3,7 @@
     <div class="max-width">
       <div class="header-content w-100 row">
         <div class="col-3 title">
-          <span>
+          <span @click="$router.push({ path: '/' })">
             AniApi
           </span>
         </div>
@@ -166,18 +166,14 @@
     background: rgba(255,255,255,0.3);
     z-index: 1000;
     height: 60px;
-    position: fixed;
   }
 
   .max-width {
     max-width: 1770px;
-    padding: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    position: relative;
-    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
   }
-  
+
   .header-content {
     height: inherit;
 
@@ -188,6 +184,7 @@
 
     .title {
       span {
+        cursor: pointer;
         position: absolute;
         font-size: 32px;
         font-weight: bold;

@@ -7,50 +7,42 @@
     <AniLoading v-if="request_pending" />
 
     <div v-show="!request_pending" class="anime-container">
-      <div class="row mx-3">
-        <div class="back-margin col-2 pr-4">
-          <div class="back-container-categories">
-            Categorias
-          </div>
-        </div>
+      <div class="back-margin">
+        <div ref="animebackground" class="back-container-anime">
+          <div class="d-flex">
+            <img :src="getImageSrc" class="anime-image">
 
-        <div class="back-margin col-10">
-          <div ref="animebackground" class="back-container-anime">
-            <div class="d-flex">
-              <img :src="getImageSrc" class="anime-image">
+            <div class="anime-details w-100">
+              <div class="anime-title">
+                {{  anime.title  }}
+              </div>
 
-              <div class="anime-details w-100">
-                <div class="anime-title">
-                  {{  anime.title  }}
+              <div class="anime-stats">
+                <span>
+                  Score: {{ anime.score }} •
+                </span>
+
+                <span>
+                  {{ anime.duration }} •
+                </span>
+
+                <span>
+                  {{ getFormattedDate(anime.aired) }}
+                </span>
+              </div>
+
+              <hr>
+
+              <div class="d-flex">
+                <div class="anime-synopsis">
+                  {{ anime.synopsis }}
                 </div>
 
-                <div class="anime-stats">
-                  <span>
-                    Score: {{ anime.score }} •
-                  </span>
-
-                  <span>
-                    {{ anime.duration }} •
-                  </span>
-
-                  <span>
-                    {{ getFormattedDate(anime.aired) }}
-                  </span>
-                </div>
-
-                <hr>
-
-                <div class="d-flex">
-                  <div class="anime-synopsis">
-                    {{ anime.synopsis }}
-                  </div>
-                  
-                  <div v-if="getAnimeHasTrailer" class="p-2 anime-trailer-container" @click="openTrailerModal">
-                    <div class="anime-play" />
-                    <div class="anime-trailer-hover" />
-                    <div class="anime-trailer d-flex justify-content-center align-items-center" :style="getAnimeTrailerImage">
-                      <img src="https://cdn-icons-png.flaticon.com/512/0/375.png" style="width: 48px; opacity: .6;">
-                    </div>
+                <div v-if="getAnimeHasTrailer" class="p-2 anime-trailer-container" @click="openTrailerModal">
+                  <div class="anime-play" />
+                  <div class="anime-trailer-hover" />
+                  <div class="anime-trailer d-flex justify-content-center align-items-center" :style="getAnimeTrailerImage">
+                    <img src="https://cdn-icons-png.flaticon.com/512/0/375.png" style="width: 48px; opacity: .6;">
                   </div>
                 </div>
               </div>
@@ -63,7 +55,7 @@
     <div class="trailer-modal" :style="shouldShowModal">
       <div class="backdrop" @click="closeTrailerModal" />
       <div class="video-player">
-        <iframe width="1280" height="720" :src="getAnimeHasTrailer" />
+        <iframe width="1280" height="720" :src="getAnimeHasTrailer" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" />
       </div>
     </div>
   </div>
@@ -73,7 +65,10 @@
   import { mapGetters, mapActions } from 'vuex';
   import ColorThief from 'colorthief/dist/color-thief.umd.js';
 
-  import { fetchAnimeById } from '../axios/api';
+  import {
+    fetchAnimeById,
+    fetchRandomAnime,
+  } from '../axios/api';
 
   export default {
     name: 'Anime',
@@ -93,7 +88,7 @@
             color2: '#9e9e9e',
           },
         ],
-        
+
         show_modal: false,
       }
     },
@@ -188,31 +183,31 @@
         if(!this.getColorLocked) {
           if(state) {
             this.$refs.animebackground.style.backgroundImage = `url(${state})`;
-  
+
             const animeImage = this.$refs.animebackground;
             const colorThief = new ColorThief();
             const backgroundImageUrl = getComputedStyle(animeImage).backgroundImage.replace(/url\((['"])?(.*?)\1\)/gi, '$2').split(',')[0];
             const image = new Image();
-  
+
             image.crossOrigin = 'Anonymous';
             image.src = backgroundImageUrl;
-  
+
             image.addEventListener('load', () => {
               const palette = colorThief.getPalette(image, 2);
               const sortedPalette = palette.sort((a, b) => b[0] - a[0]);
-  
+
               const colors = []
-  
+
               sortedPalette.forEach((palette) => {
                 const r = palette[0].toString(16).padStart(2, '0');
                 const g = palette[1].toString(16).padStart(2, '0');
                 const b = palette[2].toString(16).padStart(2, '0');
-  
+
                 colors.push('#' + r + g + b);
               });
-  
+
               this.key = this.key === 0 ? this.key = 1 : this.key = 0;
-  
+
               this.setBackgroundColor({
                 color1: colors[0],
                 color2: colors[1],
@@ -229,7 +224,7 @@
         async () => {
           this.request_pending = true;
 
-          const { data } = await fetchAnimeById(this.$route.query.id);
+          const data = await this.fetchAnime();
 
           this.request_pending = false;
           this.anime = data;
@@ -240,6 +235,18 @@
 
     methods: {
       ...mapActions(['setBackgroundColor']),
+      async fetchAnime() {
+        if (this.$route.query.id) {
+          const { data } = await fetchAnimeById(this.$route.query.id)
+
+          return data;
+        }
+
+        const { data } = await fetchRandomAnime();
+
+        this.$router.push({ path: `/anime?id=${data.mal_id}` })
+      },
+
       getFormattedDate(date) {
         if(date) {
           const { prop: { from: { day, month, year } } } = date;
@@ -257,7 +264,7 @@
             'Nov',
             'Dec',
           ]
-  
+
           return `${months[month - 1]} ${day}, ${year}`
         }
 
@@ -297,20 +304,17 @@
     left: 0;
     right: 0;
     bottom: 0;
-    // opacity: .5;
   }
 
   .anime-container {
-    max-width: 1770px;
-    padding: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    position: relative;
-    padding-top: 60px;
+    max-width: 1480px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .back-margin {
-    padding: 20px 0px;
+    padding: 90px 0px;
+    position: relative;
 
     .back-container-categories {
       padding: 20px;
@@ -327,7 +331,7 @@
       border-radius: 10px;
 
       &:before {
-        margin-top: 20px;
+        margin-top: 90px;
         border-radius: 10px;
         content: ' ';
         display: block;
